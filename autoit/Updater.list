@@ -1,0 +1,5 @@
+!!!DONTADDTOMODULELIST!!!
+description:Autoupdate infrastructure
+[{{userappdata}}\Updater]
+CopyUpdater.exe
+Updater.exe
