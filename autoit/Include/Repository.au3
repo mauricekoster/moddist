@@ -16,7 +16,7 @@ Func __getininame()
 		if not FileExists( $__ini_repo ) Then
 			$__ini_repo = @ScriptDir & "\Repositories.ini"
 		EndIf
-		ConsoleWrite( "repo ini: " & $__ini_repo & @CRLF )
+		;ConsoleWrite( "repo ini: " & $__ini_repo & @CRLF )
 	EndIf
 
 	Return $__ini_repo
@@ -87,6 +87,11 @@ EndFunc
 func GetDefaultRepositoryUrl()
 	$nr = GetDefaultRepositoryNr()
 	Return GetRepositoryURL( $nr )
+EndFunc
+
+Func GetDefaultRepositoryName()
+	$nr = GetDefaultRepositoryNr()
+	Return GetRepositoryName( $nr )
 EndFunc
 
 func GetDefaultRepositoryNr()

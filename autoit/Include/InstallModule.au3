@@ -113,8 +113,8 @@ EndFunc
 Func _description( $arr )
 	$message = $arr[1]
 	LogDebug( "descr: " & $message )
-	;TrayTip( "Updater - " & $component_name, $message, 10 )
-	Melding3( $message )
+	TrayTip( "Updater - " & $component_name, $message, 10 )
+	;Melding3( $message )
 	Sleep( 1000 )
 EndFunc
 

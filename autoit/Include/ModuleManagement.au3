@@ -62,3 +62,18 @@ Dim $aList[1]
 	Return $aList
 
 EndFunc
+
+
+Func GetModuleInfo( $aList, $aModuleName, ByRef $Description, ByRef $URL)
+
+	For $i = 1 to $aList[0]
+		$arr = StringSplit($aList[$i], "|", 1)
+		if $arr[1] == $aModuleName Then
+			$Description = $arr[2]
+			$URL = $arr[3]
+			Return True
+		EndIf
+	Next
+
+	Return False
+EndFunc

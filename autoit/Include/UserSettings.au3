@@ -5,6 +5,7 @@
 Func SettingsFolder()
 
 	$homedir = @MyDocumentsDir
+	;ConsoleWrite("Home dir: " & $homedir & @CRLF)
 
 	$d = $homedir & "\.settings"
 	If FileExists( $d ) Then
