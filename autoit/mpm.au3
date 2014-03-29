@@ -1,5 +1,6 @@
 #Region ;**** Directives created by AutoIt3Wrapper_GUI ****
-#AutoIt3Wrapper_Icon=mk.ico
+#AutoIt3Wrapper_icon=mk.ico
+#AutoIt3Wrapper_UseX64=n
 #AutoIt3Wrapper_Change2CUI=y
 #EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
 
@@ -208,7 +209,7 @@ Func ModuleInstallerGUI()
 
 Local $arr
 
-#Region ### START Koda GUI section ### Form=ModuleInstaller.kxf
+#Region ### START Koda GUI section ### Form=mpm_mainwindow.kxf
 	$Form1_1 = GUICreate($APP_NAME, 438, 485, -1, -1)
 	GUISetOnEvent($GUI_EVENT_CLOSE, "Form1Close")
 	$btn_go = GUICtrlCreateButton("GO", 104, 456, 75, 25, 0)
