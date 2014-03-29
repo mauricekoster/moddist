@@ -1,3 +1,5 @@
+#include-once
+
 Func FileDispatcher( $fn, $dispatch_table )
 	$file = FileOpen( $fn, 0 )
 	;ConsoleWrite( "! " & $fn & @CRLF )

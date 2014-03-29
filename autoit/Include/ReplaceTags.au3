@@ -7,6 +7,7 @@
 	Replaces tags in a text file and saves resulting file
 
 #ce ----------------------------------------------------------------------------
+#include-once
 
 Func ReplaceTags( $line, $tag_arr, $path_sep = "\", $case_sensitive = False)
 

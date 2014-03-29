@@ -20,6 +20,7 @@
 #include "Include\Logging.au3"
 #include "Include\Melding.au3"
 #include "Include\InstallModule.au3"
+#include "Include\UpdateModule.au3"
 #include "Include\Repository.au3"
 #include "Include\ModuleManagement.au3"
 
@@ -53,7 +54,7 @@ If not FileExists( @ScriptDir & "\unzip.exe" ) Then
 EndIf
 #EndRegion
 
-Local $descr, $url
+Local $descr, $url, $x
 
 $host_count = RepositoryCount()
 if GetDefaultRepositoryNr() == 0 Then
@@ -102,6 +103,7 @@ ElseIf $CmdLine[1] = "module" Then
 		case "install"
 			if $CmdLine[0] <> 3 Then
 				LogError("Invalid number of arguments")
+
 			Else
 				$modname = $CmdLine[3]
 				if GetModuleInfo( $Ret, $modname, $descr, $url ) Then
@@ -119,6 +121,47 @@ ElseIf $CmdLine[1] = "module" Then
 				Else
 					LogError("Unknown module name: " & $modname )
 				EndIf
+			EndIf
+
+		case "update"
+			if $CmdLine[0] <> 3 Then
+
+				LogInfo( "Start updating...")
+				println( "Start bijwerken van modules...")
+				println( "Even geduld a.u.b.")
+				LogDebug( "TEMP dir: " & @TempDir )
+				LogDebug( "APPDATA: " & @AppDataDir & "\Updater" )
+
+
+				$filesearch = FileFindFirstFile( @AppDataDir & "\Updater\*.versieinfo" )
+				if $filesearch = -1 Then
+					LogInfo("Nothing found")
+					Exit
+				EndIf
+
+				println( "--- UPDATING -----------------------------------------------------------------------------------------------------" )
+				while 1
+					$f = FileFindNextFile($filesearch)
+					if @error then ExitLoop
+
+					$result = _PathSplit($f,$x,$x,$x,$x )
+
+					$module = $result[3]
+
+					if $f <> "" then UpdateModule( $module )
+
+				WEnd
+				println("--- Done! ---------------------------------------------------------------------------------------------------------")
+
+			Else
+				$module = $CmdLine[3]
+				$fn = @AppDataDir & "\Updater\" & $module & ".versieinfo"
+				if FileExists( $fn ) Then
+					UpdateModule( $module )
+				Else
+					LogWarning("Module not installed. Nothing to update.")
+				EndIf
+
 			EndIf
 
 		case Else

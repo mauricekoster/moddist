@@ -8,19 +8,20 @@
 
 #Include "Include\Logging.au3"
 #Include "Include\Melding.au3"
-#include "Include\FileDispatcher.au3"
-#include "Include\ReplaceTags.au3"
+#include "Include\UpdateModule.au3"
+;#include "Include\ReplaceTags.au3"
 
-Global $current_version
-Global $current_url
-Global $current_build
-Global $bestand[1]
-Global $timestamp[1]
-Global $file_count
-Global $comp_name
-Global $cur_dir
+;Global $current_version
+;Global $current_url
+;Global $current_build
+;Global $bestand[1]
+;Global $timestamp[1]
+;Global $file_count
+;Global $module
+;Global $cur_dir
+Local $x
 
-Const $UPDATER_VERSION = "3"
+Const $UPDATER_VERSION = "4"
 
 LogInfo( "Updater version: " & $UPDATER_VERSION)
 
@@ -28,8 +29,7 @@ LogInfo( "Start updating...")
 Melding( "Start bijwerken van modules...||Even geduld a.u.b.")
 LogDebug( "TEMP dir: " & @TempDir )
 LogDebug( "APPDATA: " & @AppDataDir & "\Updater" )
-$addin_path = ExcelAddinsFolder()
-LogDebug( "ADDINPATH: " & $addin_path )
+
 
 $filesearch = FileFindFirstFile( @AppDataDir & "\Updater\*.versieinfo" )
 if $filesearch = -1 Then
@@ -42,286 +42,14 @@ while 1
 	$f = FileFindNextFile($filesearch)
 	if @error then ExitLoop
 
-	LogDebug( "Module versioninfo: " & $f )
-	if $f <> "" then ProcessFile( $f )
+	$result = _PathSplit($f,$x,$x,$x,$x )
+
+	$module = $result[3]
+
+	LogDebug( "Module versioninfo: " & $module )
+	if $f <> "" then UpdateModule( $module )
 
 WEnd
 MeldingSluiten()
 LogInfo( "--- THE END -----------------------------------------------------------------------------------------------------------" )
 
-
-Func ProcessFile($filename)
-Dim $x
-
-Local $file
-
-	LogInfo( "Processing file: " & $filename )
-
-	$result = _PathSplit($filename,$x,$x,$x,$x )
-
-	$comp_name = $result[3]
-
-	Melding3( "Controleren van module '" & $comp_name & "'" )
-	Melding4( "" )
-	LogInfo( "Component: " & $comp_name )
-
-    $current_url = ""
-	$cur_dir = @ScriptDir
-
-	$file_count = 0
-
-	Global $bestand[ 1 ]
-
-
-
-Dim $dt1[12][2] = [ _
-		[ "^#", "" ], _
-		[ "^versie:(.*)", "_versie1" ], _
-		[ "^description:(.*)", "_description" ], _
-		[ "^url:(.*)", "_url1" ], _
-		[ "^build:(.*)", "_build1" ], _
-		[ "^message:(.*)", "" ], _
-		[ "^menu:(.*)", "" ], _
-		[ "^shortcut:(.*)", "" ], _
-		[ "^\*(.*)", "" ], _
-		[ "^\[(.*)]", "" ], _
-		[ "([^>]*)>>>(.*)", "" ], _
-		[ "([^:]*):(.*)", "_file1" ] _
-	]
-
-	$fn = @AppDataDir & "\Updater\" & $filename
-	FileDispatcher( $fn, $dt1 )
-
-
-	$fn = @TempDir & "\" & $filename
-	LogInfo( "Downloading: " & $current_url & "/" & $filename &  "--> " &  $fn )
-	$iRet = InetGet(  $current_url & "/" & $filename, $fn )
-	If $iRet=0 Then
-		LogError( "Bestand niet gevonden op URL: " & $current_url & "/" & $filename  )
-		Return
-	EndIf
-
-	$no_change = 0
-
-	;_ArrayDisplay( $bestand )
-
-Dim $dt2[12][2] = [ _
-		[ "^#", "" ], _
-		[ "^description:(.*)", "_description" ], _
-		[ "^versie:(.*)", "_versie2" ], _
-		[ "^url:(.*)", "_url2" ], _
-		[ "^build:(.*)", "_build2" ], _
-		[ "^message:(.*)", "_message2" ], _
-		[ "^menu:(.*)", "" ], _
-		[ "^shortcut:(.*)", "" ], _
-		[ "^\*(.*)", "" ], _
-		[ "^\[(.*)]", "_map2" ], _
-		[ "([^>]*)>>>(.*)", "" ], _
-		[ "([^:]*):(.*)", "_file2" ] _
-	]
-
-
-	FileDispatcher( $fn, $dt2 )
-
-	FileMove(  @TempDir & "\" & $filename, @AppDataDir & "\Updater\" & $filename, 1 )
-	FileDelete( @TempDir & "\" & $filename )
-
-EndFunc
-
-func _description( $arr )
-	LogDebug( "Beschrijving: " & $arr[1] )
-	Melding4( $arr[1] )
-EndFunc
-
-Func _versie1( $arr )
-	$current_version = $arr[1]
-	LogDebug( "Versie: " & $current_version )
-EndFunc
-
-func _url1( $arr )
-	If $current_url = "" Then
-
-		$current_url = $arr[1]
-		LogDebug( "URL: " & $current_url )
-
-	EndIf
-EndFunc
-
-func _build1( $arr )
-	$current_build = Number($arr[1])
-	LogDebug( "Build: " & $current_build )
-EndFunc
-
-func _file1( $arr )
-	; entry is een bestand
-
-	$nm = $arr[1]
-	$ts = $arr[2]
-
-	LogDebug( $nm & "::" & $ts )
-	_ArrayAdd( $bestand, $nm )
-	_ArrayAdd( $timestamp, $ts )
-
-	$file_count += 1
-EndFunc
-
-Func _versie2( $arr )
-	$new_version = $arr[1]
-	LogDebug( "Nieuw versie: " & $new_version )
-	If $new_version = $current_version Then
-
-		LogInfo( $comp_name & " is up-to-date" )
-		$no_change = 1
-		SetError(-1)
-
-	EndIf
-EndFunc
-
-Func _url2( $arr )
-	$current_url = $arr[1]
-	LogDebug( "Switching URL: " & $current_url )
-EndFunc
-
-func _build2( $arr )
-
-	$new_build = Number($arr[1])
-	LogDebug( "Nieuwe build: " & $new_build )
-	if $current_build < $new_build Then
-
-		$dummy = $addin_path & "\" & $comp_name & ".xla"
-
-		LogDebug( "Installeer Excel-addin: " & $dummy )
-		$iRet = InetGet( $current_url & "/" & $comp_name & ".xla", $dummy )
-		if $iRet = 0 Then
-			LogWarning("Excel Addin niet gevonden (" & $dummy & ")" )
-			Return
-		EndIf
-		InstallXLA( $dummy )
-
-	EndIf
-EndFunc
-
-func _message2( $arr )
-	$message = $arr[1]
-	Melding4( $message )
-	Sleep( 1000 )
-endfunc
-
-func _map2( $arr )
-
-	$mapinfo = $arr[1]
-	if StringInStr( $mapinfo, "/" ) > 0  Then
-
-		$arr = StringSplit( $mapinfo, "/" )
-		LogDebug( "Mapmatch: " & $mapinfo )
-
-		If FileExists( @MyDocumentsDir & "\" & $comp_name & ".ini" ) Then
-			$dummy = IniRead( @MyDocumentsDir & "\" & $comp_name & ".ini", $arr[1], $arr[2], "" )
-		Else
-
-			$dummy = $arr[3]
-
-		EndIf
-
-	Else
-
-		$dummy = $mapinfo
-
-	EndIf
-
-	LogDebug( "dummy: " & $dummy )
-
-	$dummy = ReplaceDirTags( $dummy )
-
-	LogInfo( "InstallDir: " & $dummy )
-
-	If Not FileExists( $dummy ) Then
-
-		DirCreate( $dummy )
-
-	EndIf
-	$cur_dir = $dummy
-
-EndFunc
-
-func _file2( $arr )
-
-	$nm = $arr[1]
-	$ts = $arr[2]
-	LogDebug( $nm & ":" & $ts )
-
-	$found = false
-
-	for $xx = 1 to $file_count
-
-		$bestand_nm = $bestand[$xx]
-		$bestand_ts = $timestamp[$xx]
-
-		If $bestand_nm = $nm Then
-
-			;OutputDebug( "Check " & $bestand_nm )
-			$found = true
-			ExitLoop
-
-		EndIf
-	Next
-	;OutputDebug( $found )
-
-	if not $found Then
-
-		LogDebug(  "Nieuw " & $nm )
-		$iRet = InetGet( $current_url & "/" & $nm, $cur_dir & "\" & $nm )
-		if $iRet = 0 Then
-			LogWarning( "Probleem met downloaden van " & $nm )
-		Endif
-
-	Else
-
-		If Not FileExists( $cur_dir & "\" & $nm ) Then
-
-			LogDebug( "Missing " & $bestand_nm )
-			$iRet = InetGet( $current_url & "/" & $nm, $cur_dir & "\" & $nm )
-			if $iRet = 0 Then
-				LogWarning( "Probleem met downloaden van " & $nm )
-			Endif
-
-		Else
-
-			LogDebug( $bestand_ts & " < " & $ts & " ?" )
-			If $bestand_ts < $ts then
-
-				LogDebug( "Updating " & $bestand_nm & " (" & $nm & ")" )
-				LogInfo ( "Downloading: " & $current_url & "/" & $nm )
-				if StringLower($nm) = "updater.exe" Then
-					LogDebug ("*selfupdate")
-					LogInfo( "to:" & @TempDir & "\" & $nm)
-
-					$iRet = InetGet( $current_url & "/" & $nm, @TempDir & "\" & $nm )
-					if @error = 0 Then
-						FileSetTime( @TempDir & "\" & $nm, $ts )
-						If FileExists( @ScriptDir & "\CopyUpdater.exe" ) Then
-							LogDebug( "** starting CopyUpdater.exe **" )
-							ShellExecute( @ScriptDir & "\CopyUpdater.exe", "", @AppDataDir, "", @SW_HIDE )
-						EndIf
-					Else
-						LogWarning( "Probleem met downloaden van " & $nm )
-					EndIf
-				Else
-					LogInfo( "to:" & $cur_dir & "\" & $nm)
-					$iRet = InetGet( $current_url & "/" & $nm, $cur_dir & "\" & $nm )
-					if @error <> 0 Then
-
-						LogWarning( "Probleem met downloaden van " & $nm )
-					EndIf
-				Endif
-
-			EndIf
-
-		EndIf
-	EndIf
-
-	If FileExists( $cur_dir & "\" & $nm ) Then
-		FileSetTime( $cur_dir & "\" & $nm, $ts )
-	EndIf
-
-EndFunc
