@@ -16,9 +16,11 @@
 #include <Array.au3>
 #include <String.au3>
 
+; From include Library (https://github.com/mauricekoster/library)
+#include "Logging.au3"
+#include "Melding.au3"
 
-#include "Include\Logging.au3"
-#include "Include\Melding.au3"
+; Local includes
 #include "Include\InstallModule.au3"
 #include "Include\UpdateModule.au3"
 #include "Include\Repository.au3"
