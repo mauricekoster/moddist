@@ -8,12 +8,15 @@ def main():
 
 def repolist():
 	repolist = GetRepositories()
-	
+
 	print "Repository name(s):"
 	print " Nr  %-25s %-45s%-3s" % ( "Name", "URL", "Def" )
 	print '=' * 79
-	for repoinfo in repolist:		
-		print repoinfo
+	if repolist:
+		for repoinfo in repolist:
+			print repoinfo
+	else:
+		print "No repositories defined!"
 	print '=' * 79
 
 def modulelist(url):
