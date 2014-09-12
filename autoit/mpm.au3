@@ -260,7 +260,7 @@ Local $arr
 	$btn_go = GUICtrlCreateButton("GO", 104, 456, 75, 25, 0)
 	GUICtrlSetOnEvent(-1, "btn_goClick")
 	$lbl_descr = GUICtrlCreateLabel("", 8, 320, 414, 113, $SS_SUNKEN)
-	$lst_modules = GUICtrlCreateListView("Component naam|Geïnstalleerd?|Beschrijving|URL", 8, 48, 417, 233)
+	$lst_modules = GUICtrlCreateListView("Component naam|Geï¿½nstalleerd?|Beschrijving|URL", 8, 48, 417, 233)
 	GUICtrlSendMsg(-1, 0x101E, 0, 300)
 	GUICtrlSendMsg(-1, 0x101E, 1, 100)
 	GUICtrlSendMsg(-1, 0x101E, 2, 0)
@@ -382,7 +382,7 @@ Local $arr
 	endif
 
 	If $arr[2] = "Ja" Then
-		$ret = MsgBox( 4 + 32 + 256, $msgbox_title, "Module al geïnstalleerd. Wilt u deze opnieuw installeren?" )
+		$ret = MsgBox( 4 + 32 + 256, $msgbox_title, "Module al geï¿½nstalleerd. Wilt u deze opnieuw installeren?" )
 		If $ret <> 6 Then
 			GUICtrlSetState( $btn_go, $GUI_ENABLE )
 			Return
