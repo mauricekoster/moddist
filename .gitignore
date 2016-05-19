@@ -8,3 +8,5 @@
 /**/Output
 autoit/mpm.exe
 python2/**/*.pyc
+.idea/
+*.pyc

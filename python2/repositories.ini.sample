@@ -1,0 +1,11 @@
+[Repository]
+hostcount=1
+default=1
+
+[Repo1]
+name=Example
+url=http://www.example.com
+host=ftp.example.com
+user=example
+password=example
+basedir=/Repo
